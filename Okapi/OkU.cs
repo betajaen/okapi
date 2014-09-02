@@ -25,59 +25,43 @@
     
 */
 
+using UnityEngine;
+
 namespace Okapi
 {
 
-  public struct OkPoint
+  public static class OkU
   {
 
-    public OkPoint(int xValue, int yValue)
+    public static int Abs(int value)
     {
-      x = xValue;
-      y = yValue;
+      return value < 0 ? -value : value;
     }
 
-    public static OkPoint operator +(OkPoint lhs, OkPoint rhs)
+    public static float ComputeVelocity(float velocity, float acceleration, float drag, float maxVelocity)
     {
-      return new OkPoint(lhs.x + rhs.x, lhs.y + rhs.y);
-    }
+      if (Mathf.Abs(acceleration) > 0.0f)
+      {
+        velocity += acceleration * OkG.Elapsed;
+      }
+      else if (drag > 0.0f == false)
+      {
+        float dragValue = drag * OkG.Elapsed;
+        if (velocity - dragValue > 0.0f)
+          velocity = velocity - dragValue;
+        else if (velocity + dragValue < 0.0f)
+          velocity = velocity + dragValue;
+        else
+          velocity = 0.0f;
+      }
 
-    public static OkPoint operator -(OkPoint lhs, OkPoint rhs)
-    {
-      return new OkPoint(lhs.x - rhs.x, lhs.y - rhs.y);
-    }
+      if (velocity > maxVelocity)
+        velocity = maxVelocity;
+      else if (velocity < -maxVelocity)
+        velocity = -maxVelocity;
 
-    public static OkPoint operator *(OkPoint lhs, OkPoint rhs)
-    {
-      return new OkPoint(lhs.x * rhs.x, lhs.y * rhs.y);
+      return velocity;
     }
-
-    public static OkPoint operator /(OkPoint lhs, OkPoint rhs)
-    {
-      return new OkPoint(lhs.x / rhs.x, lhs.y / rhs.y);
-    }
-
-    public static OkPoint operator *(OkPoint lhs, int rhs)
-    {
-      return new OkPoint(lhs.x * rhs, lhs.y * rhs);
-    }
-
-    public static OkPoint operator /(OkPoint lhs, int rhs)
-    {
-      return new OkPoint(lhs.x / rhs, lhs.y / rhs);
-    }
-
-    public static OkPoint operator *(int lhs, OkPoint rhs)
-    {
-      return new OkPoint(lhs * rhs.x, lhs * rhs.y);
-    }
-
-    public static OkPoint operator /(int lhs, OkPoint rhs)
-    {
-      return new OkPoint(lhs / rhs.y, lhs / rhs.y);
-    }
-
-    public int x, y;
   }
 
 }

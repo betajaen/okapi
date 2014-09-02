@@ -28,56 +28,11 @@
 namespace Okapi
 {
 
-  public struct OkPoint
+  public static class OkG
   {
+    public static float Elapsed;
 
-    public OkPoint(int xValue, int yValue)
-    {
-      x = xValue;
-      y = yValue;
-    }
-
-    public static OkPoint operator +(OkPoint lhs, OkPoint rhs)
-    {
-      return new OkPoint(lhs.x + rhs.x, lhs.y + rhs.y);
-    }
-
-    public static OkPoint operator -(OkPoint lhs, OkPoint rhs)
-    {
-      return new OkPoint(lhs.x - rhs.x, lhs.y - rhs.y);
-    }
-
-    public static OkPoint operator *(OkPoint lhs, OkPoint rhs)
-    {
-      return new OkPoint(lhs.x * rhs.x, lhs.y * rhs.y);
-    }
-
-    public static OkPoint operator /(OkPoint lhs, OkPoint rhs)
-    {
-      return new OkPoint(lhs.x / rhs.x, lhs.y / rhs.y);
-    }
-
-    public static OkPoint operator *(OkPoint lhs, int rhs)
-    {
-      return new OkPoint(lhs.x * rhs, lhs.y * rhs);
-    }
-
-    public static OkPoint operator /(OkPoint lhs, int rhs)
-    {
-      return new OkPoint(lhs.x / rhs, lhs.y / rhs);
-    }
-
-    public static OkPoint operator *(int lhs, OkPoint rhs)
-    {
-      return new OkPoint(lhs * rhs.x, lhs * rhs.y);
-    }
-
-    public static OkPoint operator /(int lhs, OkPoint rhs)
-    {
-      return new OkPoint(lhs / rhs.y, lhs / rhs.y);
-    }
-
-    public int x, y;
+    public static OkCamera Camera;
   }
 
 }
