@@ -8,28 +8,6 @@ using UnityEngine;
 namespace OkapiEditor
 {
 
-  public class OkSetupAssetPostProcessor : AssetPostprocessor
-  {
-
-    public static String assetName;
-    public static bool assetNameLoaded;
-
-    static void OnPostprocessAllAssets(String[] imported, String[] deleted, String[] moved, String[] moved2)
-    {
-      if (OkSetup.mode != OkSetup.kState_None)
-      {
-        foreach (var str in imported)
-        {
-          Debug.Log(str + " vs " + assetName);
-          if (str == assetName)
-          {
-            assetNameLoaded = true;
-          }
-        }
-      }
-    }
-  }
-
   public static class OkSetup
   {
 
@@ -43,7 +21,7 @@ namespace OkapiEditor
     public const int kState_Setup_4_State = 7;
     public const int kState_Setup_5_Atlas = 8;
     public const int kState_Setup_7_RefreshAssets = 9;
-    public const int kState_Setup_8_WaitForScriptsToCompile = 10;
+    public const int kState_Setup_8_SetupGameObject = 10;
 
     public const int kState_Finished = 1000;
 
@@ -78,6 +56,7 @@ namespace OkapiEditor
     private static String tImportAbsolutePath;
 
     private static GameObject tGameObject;
+    private static OkOkapi tGame;
 
     public static void Reset()
     {
@@ -90,10 +69,6 @@ namespace OkapiEditor
       atlasRule = kAtlas_New;
       atlasName = "Art";
       atlasReference = null;
-
-      OkSetupAssetPostProcessor.assetName = String.Empty;
-      OkSetupAssetPostProcessor.assetNameLoaded = false;
-
     }
 
     public static void Begin()
@@ -222,8 +197,6 @@ namespace OkapiEditor
           sb.Replace("*", scale.ToString());
 
           String assetPath = String.Format("{0}/{1}.cs", tScriptsAbsolutePath, name);
-          OkSetupAssetPostProcessor.assetName = String.Format("{0}/{1}.cs", tScriptsRelativePath, name);
-          OkSetupAssetPostProcessor.assetNameLoaded = false;
 
           System.IO.File.WriteAllText(assetPath, sb.ToString());
 
@@ -258,50 +231,18 @@ namespace OkapiEditor
         {
           SendUpdate("Refreshing the Asset database", 45);
           AssetDatabase.Refresh();
-          WaitThen(10, kState_Setup_8_WaitForScriptsToCompile);
+          WaitThen(10, kState_Setup_8_SetupGameObject);
         }
         break;
-        case kState_Setup_8_WaitForScriptsToCompile:
+        case kState_Setup_8_SetupGameObject:
         {
-          SendUpdate("Waiting for scripts to update", 50);
+          SendUpdate("Setting up the Scene", 50);
 
-          if (OkSetupAssetPostProcessor.assetNameLoaded)
-          {
-            Debug.Log("Attempting Creation");
+          tGameObject = new GameObject("Okapi Game");
+          tGame = tGameObject.AddComponent<Okapi.OkOkapi>();
+          tGame.gameName = name;
 
-            EditorUtility.ClearProgressBar();
-            End();
-            mode = kState_None;
-
-            var s = MonoImporter.GetAllRuntimeMonoScripts();
-
-            foreach (var d in s)
-            {
-              if (d.name == name)
-              {
-                Type type = d.GetClass();
-
-                tGameObject = new GameObject("Okapi Game", type);
-                return;
-              }
-            }
-          }
-
-          //
-          //          var s = MonoImporter.GetAllRuntimeMonoScripts();
-          //          foreach (var d in s)
-          //          {
-          //            if (d.name == name)
-          //            {
-          //              MonoImporter.SetExecutionOrder(d, MonoImporter.GetExecutionOrder(d));
-          //              Type type = d.GetClass();
-          //
-          //              WaitThen(10, kState_Finished);
-          //              tGameObject = new GameObject("Okapi Game", type);
-          //              return;
-          //            }
-          //          }
-
+          WaitThen(10, kState_Finished);
         }
         break;
         case kState_Finished:
@@ -332,9 +273,9 @@ namespace OkapiEditor
 
 public class $ : OkGame
 {
-  void Start()
+  public $() : base(*, typeof(^))
   {
-    SetupGame(*, typeof(^));
+    // Your code here.
   }
 }
 ";
