@@ -313,14 +313,14 @@ namespace Okapi
       if (object1.immovable && object2.immovable)
         return false;
 
-      if (object1 is OkTilemap)
-      {
-        return (object1 as OkTilemap).OverlapsWithCallback(object2, SeperateX);
-      }
-      else if (object2 is OkTilemap)
-      {
-        return (object2 as OkTilemap).OverlapsWithCallback(object1, SeperateX, true);
-      }
+      //      if (object1 is OkTilemap)
+      //      {
+      //        return (object1 as OkTilemap).OverlapsWithCallback(object2, SeperateX);
+      //      }
+      //      else if (object2 is OkTilemap)
+      //      {
+      //        return (object2 as OkTilemap).OverlapsWithCallback(object1, SeperateX, true);
+      //      }
 
       // First get the two object deltas
       int overlap = 0;
@@ -439,14 +439,14 @@ namespace Okapi
       if (object1.immovable && object2.immovable)
         return false;
 
-      if (object1 is OkTilemap)
-      {
-        return (object1 as OkTilemap).OverlapsWithCallback(object2, SeperateY);
-      }
-      else if (object2 is OkTilemap)
-      {
-        return (object2 as OkTilemap).OverlapsWithCallback(object1, SeperateY, true);
-      }
+      //      if (object1 is OkTilemap)
+      //      {
+      //        return (object1 as OkTilemap).OverlapsWithCallback(object2, SeperateY);
+      //      }
+      //      else if (object2 is OkTilemap)
+      //      {
+      //        return (object2 as OkTilemap).OverlapsWithCallback(object1, SeperateY, true);
+      //      }
 
       // First get the two object deltas
       int overlap = 0;
@@ -584,10 +584,10 @@ namespace Okapi
         return results;
       }
 
-      if (objectOrGroup is OkTilemap)
-      {
-        return (objectOrGroup as OkTilemap).Overlaps(this, inScreenSpace, camera);
-      }
+      //      if (objectOrGroup is OkTilemap)
+      //      {
+      //        return (objectOrGroup as OkTilemap).Overlaps(this, inScreenSpace, camera);
+      //      }
 
       if (objectOrGroup is OkObject == false)
         return false;
@@ -636,11 +636,11 @@ namespace Okapi
         return results;
       }
 
-      if (objectOrGroup is OkTilemap)
-      {
-        OkTilemap tilemap = objectOrGroup as OkTilemap;
-        return tilemap.OverlapsAt(tilemap.x - (atX - x), tilemap.y - (atY - y), this, inScreenSpace, camera);
-      }
+      //      if (objectOrGroup is OkTilemap)
+      //      {
+      //        OkTilemap tilemap = objectOrGroup as OkTilemap;
+      //        return tilemap.OverlapsAt(tilemap.x - (atX - x), tilemap.y - (atY - y), this, inScreenSpace, camera);
+      //      }
 
       if (objectOrGroup is OkObject == false)
         return false;

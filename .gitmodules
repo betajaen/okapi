@@ -1,0 +1,3 @@
+[submodule "Okapi/Giraffe"]
+	path = Okapi/Giraffe
+	url = https://github.com/betajaen/giraffe.git
