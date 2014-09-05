@@ -1,13 +1,11 @@
-﻿using System;
+using System;
 using System.Text;
-using System.Threading;
 using Okapi;
 using UnityEditor;
 using UnityEngine;
 
 namespace OkapiEditor
 {
-
   public static class OkSetup
   {
 
@@ -38,7 +36,13 @@ namespace OkapiEditor
 
     public static String name;
     public static String state;
-    public static int scale;
+    public static String namespace_;
+    public static int gameResolutionWidth;
+    public static int gameResolutionHeight;
+    public static OkU.GamePlacement gamePlacement;
+    public static OkU.DisplayOrientation gameOrientation;
+    public static float gameScale;
+
     public static String sceneName;
     public static int sceneRule;
     public static int atlasRule;
@@ -63,9 +67,14 @@ namespace OkapiEditor
       mode = 0;
       name = "MyGame";
       sceneName = "MyGame";
+      namespace_ = String.Empty;
       state = "Play";
-      scale = 1;
-      sceneRule = kScene_UseThis;
+      gameScale = 1;
+      gameResolutionWidth = 960;
+      gameResolutionHeight = 640;
+      gamePlacement = OkU.GamePlacement.FixedScaleCentred;
+      gameOrientation = OkU.DisplayOrientation.Landscape;
+      sceneRule = kScene_Create;
       atlasRule = kAtlas_New;
       atlasName = "Art";
       atlasReference = null;
@@ -192,9 +201,21 @@ namespace OkapiEditor
           SendUpdate(String.Format("Creating the {0} MonoBehaviour", name), 30);
 
           StringBuilder sb = new StringBuilder(msGameMonoBehaviourSource);
-          sb.Replace("$", name);
-          sb.Replace("^", state);
-          sb.Replace("*", scale.ToString());
+
+          if (namespace_ == String.Empty)
+          {
+            sb.Replace("$NSB", String.Empty);
+            sb.Replace("$NSE", String.Empty);
+          }
+          else
+          {
+            sb.Replace("$NSB", String.Format("namespace {0}\n{\n", namespace_));
+            sb.Replace("$NSE", "}");
+          }
+
+          sb.Replace("$CLA", name);
+          sb.Replace("$STA", state);
+          sb.Replace("$SCA", gameScale.ToString());
 
           String assetPath = String.Format("{0}/{1}.cs", tScriptsAbsolutePath, name);
 
@@ -208,7 +229,19 @@ namespace OkapiEditor
           SendUpdate(String.Format("Creating the {0} State", state), 35);
 
           StringBuilder sb = new StringBuilder(msStateSource);
-          sb.Replace("$", state);
+
+          if (namespace_ == String.Empty)
+          {
+            sb.Replace("$NSB", String.Empty);
+            sb.Replace("$NSE", String.Empty);
+          }
+          else
+          {
+            sb.Replace("$NSB", String.Format("namespace {0}\n{\n", namespace_));
+            sb.Replace("$NSE", "}");
+          }
+
+          sb.Replace("$CLA", state);
 
           System.IO.File.WriteAllText(String.Format("{0}/{1}.cs", tScriptsAbsolutePath, state), sb.ToString());
 
@@ -269,98 +302,34 @@ namespace OkapiEditor
     }
 
     private static String msGameMonoBehaviourSource =
-@"using Okapi;
+      @"using Okapi;
 
-public class $ : OkGame
+$NSB
+public class $CLA : OkGame
 {
-  public $() : base(*, typeof(^))
+  public $CLA()
   {
-    // Your code here.
+    Run<$STA>(scale: $SCA);
+    // Any extra game related code you want can go here.
   }
 }
+$NSE
 ";
 
     private static String msStateSource =
-@"using Okapi;
+      @"using Okapi;
 using UnityEngine;
 
-public class $ : OkState
+$NSB
+public class $CLA : OkState
 {
-  public $()
+  public $CLA()
   {
     // Your code here.
   }
 }
+$NSE
 ";
 
   }
-
-  public class OkWizard : EditorWindow
-  {
-    [MenuItem("Okapi/Setup Okapi Game")]
-    static void Menu_SetupOkapiGame()
-    {
-      OkSetup.Reset();
-      OkSetup.mode = OkSetup.kState_SetupGUI;
-      msScaleIndex = 0;
-
-      var win = EditorWindow.GetWindow<OkWizard>(true);
-      win.title = "Okapi";
-      Vector2 size = new Vector2(400, 300);
-      win.maxSize = size;
-      win.minSize = size;
-      win.position = new Rect(Screen.currentResolution.width / 2 - size.x / 2, Screen.currentResolution.height / 2 - size.y / 2, size.x, size.y);
-    }
-
-    private static GUIStyle msHeadingText;
-    private static readonly String[] msScaleNames = new String[] { "1x", "2x", "4x", "8x" };
-    private static readonly int[] msScaleValues = new int[] { 1, 2, 4, 8 };
-    private static readonly String[] msSceneNames = new string[] { "This Scene", "New Scene" };
-    private static int msScaleIndex = 0;
-
-    private void OnGUI()
-    {
-      if (msHeadingText == null)
-      {
-        msHeadingText = new GUIStyle(EditorStyles.largeLabel);
-        msHeadingText.fontSize = 24;
-        msHeadingText.alignment = TextAnchor.MiddleCenter;
-      }
-
-      GUILayout.BeginVertical();
-      GUILayout.Label("Okapi Game Maker", msHeadingText);
-
-
-      GUILayout.Label("Scene");
-      EditorGUI.indentLevel++;
-
-      OkSetup.sceneRule = EditorGUILayout.Popup("Where", OkSetup.sceneRule, msSceneNames);
-      if (OkSetup.sceneRule == 1)
-      {
-        OkSetup.sceneName = EditorGUILayout.TextField("Name", OkSetup.sceneName);
-      }
-
-      msScaleIndex = EditorGUILayout.Popup("Scale", msScaleIndex, msScaleNames);
-      OkSetup.scale = msScaleValues[msScaleIndex];
-
-      EditorGUI.indentLevel--;
-
-      GUILayout.EndVertical();
-      GUILayout.BeginHorizontal();
-
-      if (GUILayout.Button("Create"))
-      {
-        OkSetup.mode = OkSetup.kState_OkapiOrdered;
-        OkSetup.Begin();
-        Close();
-      }
-
-      GUILayout.EndHorizontal();
-
-
-    }
-
-  }
-
-
 }

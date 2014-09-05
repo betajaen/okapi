@@ -25,6 +25,7 @@
     
 */
 
+using System;
 using UnityEngine;
 
 namespace Okapi
@@ -32,6 +33,21 @@ namespace Okapi
 
   public static class OkU
   {
+
+    public enum GamePlacement
+    {
+      FixedScale,
+      FixedScaleCentred,
+      FitToScreenCentred,
+    }
+
+    [Flags]
+    public enum DisplayOrientation
+    {
+      Landscape = 1,
+      Portrait = 2,
+      Any = Landscape | Portrait
+    }
 
     public static int Abs(int value)
     {
@@ -62,6 +78,95 @@ namespace Okapi
 
       return velocity;
     }
+
+    public static DisplayOrientation SwapDisplayOrientation(DisplayOrientation orientation)
+    {
+      return orientation == DisplayOrientation.Portrait ? DisplayOrientation.Landscape : DisplayOrientation.Portrait;
+    }
+
+    public static bool ComputeScreenBoundary(OkPoint gameSize, float gameScale, GamePlacement gamePlacement, DisplayOrientation gameOrientation, OkPoint displaySize, DisplayOrientation displayOrientation, out OkRect computedGameRect, out DisplayOrientation computedGameOrientation, out float computedScale)
+    {
+      computedGameRect = new OkRect(0, 0, (int)(gameSize.x * gameScale), (int)(gameSize.y * gameScale));
+      computedScale = gameScale;
+      computedGameOrientation = displayOrientation;
+
+      switch (displayOrientation)
+      {
+        case DisplayOrientation.Landscape:
+        {
+          switch (gameOrientation)
+          {
+            case DisplayOrientation.Any:
+            case DisplayOrientation.Portrait:
+            {
+              gameSize.SwapElements();
+            }
+            break;
+          }
+        }
+        break;
+        case DisplayOrientation.Portrait:
+        {
+          switch (gameOrientation)
+          {
+            case DisplayOrientation.Any:
+            case DisplayOrientation.Landscape:
+            {
+              gameSize.SwapElements();
+            }
+            break;
+          }
+        }
+        break;
+      }
+
+      switch (gamePlacement)
+      {
+        case GamePlacement.FixedScale:
+        {
+          int width = (int)(gameSize.x * gameScale);
+          int height = (int)(gameSize.y * gameScale);
+          int left = 0;
+          int top = 0;
+
+          computedGameRect = new OkRect(left, top, width, height);
+          computedGameOrientation = displayOrientation;
+          computedScale = gameScale;
+        }
+        break;
+        case GamePlacement.FixedScaleCentred:
+        {
+          int width = (int)(gameSize.x * gameScale);
+          int height = (int)(gameSize.y * gameScale);
+          int left = displaySize.x / 2 - width / 2;
+          int top = displaySize.y / 2 - height / 2;
+
+          computedGameRect = new OkRect(left, top, width, height);
+          computedGameOrientation = displayOrientation;
+          computedScale = gameScale;
+        }
+        break;
+        case GamePlacement.FitToScreenCentred:
+        {
+
+
+          gameScale = 1.0f / Mathf.Max((float)gameSize.x / (float)displaySize.x, (float)gameSize.y / (float)displaySize.y);
+
+          int width = (int)(gameSize.x * gameScale);
+          int height = (int)(gameSize.y * gameScale);
+          int left = displaySize.x / 2 - width / 2;
+          int top = displaySize.y / 2 - height / 2;
+
+          computedGameRect = new OkRect(left, top, width, height);
+          computedGameOrientation = displayOrientation;
+          computedScale = gameScale;
+        }
+        break;
+      }
+
+      return (displaySize.x * displaySize.y - computedGameRect.Area() >= 0);
+    }
+
   }
 
 }

@@ -26,15 +26,30 @@
 */
 
 using System;
+using UnityEngine;
 
 namespace Okapi
 {
 
-  public abstract class OkGame
+  public abstract class OkGame : ScriptableObject
   {
 
-    protected OkGame(int scale, Type state)
+    protected OkGame()
     {
+    }
+
+    protected void Run<T>(int scale) where T : OkState, new()
+    {
+      Debug.Log("Hello");
+    }
+
+    protected void Stop()
+    {
+    }
+
+    public void ProcessFrame()
+    {
+
     }
 
   }

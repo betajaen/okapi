@@ -25,6 +25,8 @@
     
 */
 
+using System;
+
 namespace Okapi
 {
 
@@ -37,6 +39,16 @@ namespace Okapi
       y = yValue;
       width = widthValue;
       height = heightValue;
+    }
+
+    public int Area()
+    {
+      return width * height;
+    }
+
+    public override string ToString()
+    {
+      return String.Format("[{0},{1} {2}x{3}]", x, y, width, height);
     }
 
     public int x, y, width, height;

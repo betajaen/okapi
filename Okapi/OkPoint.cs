@@ -25,6 +25,9 @@
     
 */
 
+using System;
+using UnityEngine;
+
 namespace Okapi
 {
 
@@ -75,6 +78,43 @@ namespace Okapi
     public static OkPoint operator /(int lhs, OkPoint rhs)
     {
       return new OkPoint(lhs / rhs.y, lhs / rhs.y);
+    }
+
+    public static OkPoint operator *(OkPoint lhs, float rhs)
+    {
+      return new OkPoint((int)(lhs.x * rhs), (int)(lhs.y * rhs));
+    }
+
+    public static OkPoint operator *(float lhs, OkPoint rhs)
+    {
+      return new OkPoint((int)(lhs * rhs.x), (int)(lhs * rhs.y));
+    }
+
+    public void SwapElements()
+    {
+      int t = y;
+      y = x;
+      x = t;
+    }
+
+    public int Squared()
+    {
+      return x * x + y * y;
+    }
+
+    public int MaxElement()
+    {
+      return Mathf.Max(x, y);
+    }
+
+    public int MinElements()
+    {
+      return Mathf.Min(x, y);
+    }
+
+    public override string ToString()
+    {
+      return String.Format("[{0},{1}]", x, y);
     }
 
     public int x, y;
