@@ -45,10 +45,74 @@ namespace Okapi
     [NonSerialized]
     private OkGame mGame;
 
+    [HideInInspector]
+    [SerializeField]
+    private OkU.GamePlacement mPlacement;
+
+    [HideInInspector]
+    [SerializeField]
+    private OkU.DisplayOrientation mPreferredOrientation;
+
+    [HideInInspector]
+    [SerializeField]
+    private float mCustomScale;
+
+    [NonSerialized]
+    private bool mStarted;
+
+    public OkU.GamePlacement placement
+    {
+      get
+      {
+        return mPlacement;
+      }
+      set
+      {
+        mPlacement = value;
+        if (Application.isPlaying && mStarted)
+        {
+          ApplyPresentation();
+        }
+      }
+    }
+
+    public OkU.DisplayOrientation preferredOrientation
+    {
+      get
+      {
+        return mPreferredOrientation;
+      }
+      set
+      {
+        mPreferredOrientation = value;
+        if (Application.isPlaying && mStarted)
+        {
+          ApplyPresentation();
+        }
+      }
+    }
+
+    public float customScale
+    {
+      get
+      {
+        return mCustomScale;
+      }
+      set
+      {
+        mCustomScale = value;
+        if (Application.isPlaying && mStarted)
+        {
+          ApplyPresentation();
+        }
+      }
+    }
+
     public void Awake()
     {
       msInstance = this;
       mGame = ScriptableObject.CreateInstance(gameName) as OkGame;
+      mStarted = true;
     }
 
     public static OkOkapi Instance
@@ -57,6 +121,12 @@ namespace Okapi
     }
 
     private static OkOkapi msInstance;
+
+
+    void ApplyPresentation()
+    {
+
+    }
 
   }
 

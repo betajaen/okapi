@@ -41,13 +41,15 @@ namespace OkapiEditor
     public static int gameResolutionHeight;
     public static OkU.GamePlacement gamePlacement;
     public static OkU.DisplayOrientation gameOrientation;
-    public static float gameScale;
+    public static float gameCustomScale;
 
     public static String sceneName;
     public static int sceneRule;
-    public static int atlasRule;
-    public static String atlasName;
     public static GiraffeAtlas atlasReference;
+
+    public static String pathResources;
+    public static String pathScripts;
+    public static String pathImportedAssets;
 
     private static String tResourcesFolderName;
     private static String tResourcesAbsolutePath;
@@ -69,15 +71,16 @@ namespace OkapiEditor
       sceneName = "MyGame";
       namespace_ = String.Empty;
       state = "Play";
-      gameScale = 1;
+      gameCustomScale = 1;
       gameResolutionWidth = 960;
       gameResolutionHeight = 640;
-      gamePlacement = OkU.GamePlacement.FixedScaleCentred;
+      gamePlacement = OkU.GamePlacement.FitToScreenCentred;
       gameOrientation = OkU.DisplayOrientation.Landscape;
       sceneRule = kScene_Create;
-      atlasRule = kAtlas_New;
-      atlasName = "Art";
       atlasReference = null;
+      pathScripts = "Scripts";
+      pathResources = "Resources";
+      pathImportedAssets = "Imported Assets";
     }
 
     public static void Begin()
@@ -182,16 +185,16 @@ namespace OkapiEditor
 
           tScriptsRelativePath = String.Format("Assets/{0}", tScriptsFolderName);
           tScriptsAbsolutePath = String.Format("{0}/{1}", Application.dataPath, tScriptsFolderName);
-
-          if (atlasRule != kAtlas_None)
-          {
-            tImportFolderName = "Import";
-            tImportAbsolutePath = String.Format("{0}/{1}", Application.dataPath, tScriptsFolderName);
-            if (System.IO.Directory.Exists(tImportAbsolutePath) == false)
-            {
-              AssetDatabase.CreateFolder("Assets", tImportFolderName);
-            }
-          }
+          //
+          //          if (atlasRule != kAtlas_None)
+          //          {
+          //            tImportFolderName = "Import";
+          //            tImportAbsolutePath = String.Format("{0}/{1}", Application.dataPath, tScriptsFolderName);
+          //            if (System.IO.Directory.Exists(tImportAbsolutePath) == false)
+          //            {
+          //              AssetDatabase.CreateFolder("Assets", tImportFolderName);
+          //            }
+          //          }
 
           WaitThen(100, kState_Setup_3_GameMonobehaviour);
         }
@@ -215,7 +218,7 @@ namespace OkapiEditor
 
           sb.Replace("$CLA", name);
           sb.Replace("$STA", state);
-          sb.Replace("$SCA", gameScale.ToString());
+          sb.Replace("$SCA", gameCustomScale.ToString());
 
           String assetPath = String.Format("{0}/{1}.cs", tScriptsAbsolutePath, name);
 
@@ -250,12 +253,12 @@ namespace OkapiEditor
         break;
         case kState_Setup_5_Atlas:
         {
-          if (atlasRule == kAtlas_New)
-          {
-            SendUpdate(String.Format("Creating the {0} atlas", atlasName), 40);
-            GiraffeAtlasEditor.CreateAtlas(String.Format("Assets/{0}", tResourcesFolderName), atlasName);
-            Debug.Log("Created atlas");
-          }
+          //          if (atlasRule == kAtlas_New)
+          //          {
+          //            SendUpdate(String.Format("Creating the {0} atlas", atlasName), 40);
+          //            GiraffeAtlasEditor.CreateAtlas(String.Format("Assets/{0}", tResourcesFolderName), atlasName);
+          //            Debug.Log("Created atlas");
+          //          }
 
           WaitThen(10, kState_Setup_7_RefreshAssets);
         }
@@ -309,7 +312,7 @@ public class $CLA : OkGame
 {
   public $CLA()
   {
-    Run<$STA>(scale: $SCA);
+    Run<$STA>();
     // Any extra game related code you want can go here.
   }
 }
