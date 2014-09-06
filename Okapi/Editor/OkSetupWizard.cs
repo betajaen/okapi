@@ -15,8 +15,8 @@ namespace OkapiEditor
 
     private static Vector2 msWindowSize = new Vector2(400, 580);
     private static Vector2 msScreenPreviewWindowSize = new Vector2(800, 580);
-    private const int kPaneWidth = 390;
-    private const int kPaneHeight = 490;
+    public const int kPaneWidth = 390;
+    public const int kPaneHeight = 490;
 
     [MenuItem("Okapi/Setup Okapi Game")]
     static void Menu_SetupOkapiGame()
@@ -29,6 +29,10 @@ namespace OkapiEditor
       win.maxSize = msWindowSize;
       win.minSize = msWindowSize;
       win.position = new Rect(Screen.currentResolution.width / 2 - msWindowSize.x / 2, Screen.currentResolution.height / 2 - msWindowSize.y / 2, msWindowSize.x, msWindowSize.y);
+
+      win.resolutionPreview = true;
+      win.ShowPreview();
+      win.RefreshPreview();
     }
 
     private OkSetupPreview mScreenPreview;
@@ -104,10 +108,12 @@ namespace OkapiEditor
         EditorGUI.indentLevel++;
 
         OkSetup.sceneRule = EditorGUILayout.Popup("Where", OkSetup.sceneRule, kSceneNames);
-        if (OkSetup.sceneRule == 1)
-        {
-          OkSetup.sceneName = EditorGUILayout.TextField("Name", OkSetup.sceneName);
-        }
+        if (OkSetup.sceneRule == 0)
+          GUI.enabled = false;
+
+        OkSetup.sceneName = EditorGUILayout.TextField("Name", OkSetup.sceneName);
+
+        GUI.enabled = true;
 
         EditorGUI.indentLevel--;
       }
@@ -307,20 +313,21 @@ namespace OkapiEditor
 
       int indent = EditorGUI.indentLevel;
       EditorGUI.indentLevel = 0;
+
       GUILayout.BeginHorizontal(EditorStyles.textArea);
 
       GUI.changed = false;
 
-      int widthWidth = (int)EditorStyles.label.CalcSize(new GUIContent(OkSetup.gameResolutionWidth.ToString())).x;
+      int widthWidth = (int)EditorStyles.label.CalcSize(new GUIContent(width.ToString())).x;
 
-      OkSetup.gameResolutionWidth = EditorGUILayout.IntField(OkSetup.gameResolutionWidth, EditorStyles.label, GUILayout.Width(widthWidth));
+      width = EditorGUILayout.IntField(width, EditorStyles.label, GUILayout.Width(widthWidth));
       changed |= GUI.changed;
 
       GUILayout.Label("\u00D7", GUILayout.Width(msResolutionXWidth));
 
       GUI.changed = false;
 
-      OkSetup.gameResolutionHeight = EditorGUILayout.IntField(OkSetup.gameResolutionHeight, EditorStyles.label, GUILayout.ExpandWidth(true));
+      height = EditorGUILayout.IntField(height, EditorStyles.label, GUILayout.ExpandWidth(true));
       changed |= GUI.changed;
 
       GUI.changed = false;
@@ -356,6 +363,12 @@ namespace OkapiEditor
             OkSetup.gameResolutionHeight = res.height;
           }
           break;
+          case 1:
+          {
+            mScreenPreview.mDisplayWidth = res.width;
+            mScreenPreview.mDisplayHeight = res.height;
+          }
+          break;
         }
         RefreshPreview();
       }
@@ -363,7 +376,7 @@ namespace OkapiEditor
 
     void ShowPreview()
     {
-      mScreenPreview = new OkSetupPreview();
+      mScreenPreview = new OkSetupPreview(this);
       this.maxSize = msScreenPreviewWindowSize;
       this.minSize = msScreenPreviewWindowSize;
     }

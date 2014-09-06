@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEditor;
 using UnityEngine;
 using System.Collections;
 
@@ -95,14 +96,83 @@ namespace OkapiEditor
   public class OkSetupPreview
   {
 
+    enum OkDeviceOrientation
+    {
+      Landscape,
+      Portrait
+    }
+
+    private GUIStyle mBackgroundStyle, mToolbarStyle, mToolbarLabelStyle, mToolbarDropdownStyle;
+    private OkSetupWizard mWizard;
+    public int mDisplayWidth, mDisplayHeight;
+    public OkDeviceType mDeviceType;
+    private OkDeviceOrientation mDeviceOrientation;
+
+    public OkSetupPreview(OkSetupWizard wizard)
+    {
+      mWizard = wizard;
+      mDisplayWidth = OkSetup.gameResolutionWidth;
+      mDisplayHeight = OkSetup.gameResolutionHeight;
+      mDeviceType = OkDeviceType.None;
+      Debug.Log("hello");
+    }
+
     public void Inspect()
     {
+
+      if (mBackgroundStyle == null)
+      {
+        mBackgroundStyle = new GUIStyle(EditorStyles.objectFieldThumb);
+        mBackgroundStyle.padding = new RectOffset(1, 2, 1, 1);
+        mToolbarStyle = new GUIStyle(EditorStyles.toolbar);
+        mToolbarStyle.fixedHeight = 25;
+        mToolbarStyle.padding = new RectOffset(0, 0, 0, -1);
+        mToolbarStyle.margin = new RectOffset(0, 0, 0, -1);
+
+        mToolbarDropdownStyle = new GUIStyle(EditorStyles.toolbarDropDown);
+        mToolbarDropdownStyle.fixedHeight = 25;
+        mToolbarLabelStyle = new GUIStyle(EditorStyles.toolbarDropDown);
+        mToolbarLabelStyle.normal.background = null;
+        mToolbarLabelStyle.fixedHeight = 25;
+
+      }
+
+      GUILayout.BeginVertical(mBackgroundStyle);
+
+      GUILayout.BeginHorizontal(mToolbarStyle, GUILayout.Height(25));
+      GUILayout.Label("Resolution", mToolbarLabelStyle, GUILayout.Height(25));
+
+      if (mWizard.ResolutionField(ref mDisplayWidth, ref mDisplayHeight, 1))
+      {
+
+      }
+
+      mDeviceOrientation = (OkDeviceOrientation)EditorGUILayout.EnumPopup(mDeviceOrientation, mToolbarDropdownStyle, GUILayout.Height(25));
+
+      GUILayout.EndHorizontal();
+
+      GUILayout.EndVertical();
+
+      GUILayout.BeginVertical(mBackgroundStyle, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+      {
+        GUILayout.FlexibleSpace();
+        GUILayout.BeginHorizontal();
+        {
+          GUILayout.FlexibleSpace();
+        }
+        GUILayout.EndHorizontal();
+        GUILayout.FlexibleSpace();
+      }
+      GUILayout.EndVertical();
+
+
 
     }
 
     public void Refresh()
     {
 
+      mWizard.Repaint();
     }
   }
 
