@@ -112,6 +112,14 @@ namespace Okapi
       return Mathf.Min(x, y);
     }
 
+    public OkPoint SortElements()
+    {
+      if (x < y)
+        return new OkPoint(y, x);
+      else
+        return new OkPoint(x, y);
+    }
+
     public override string ToString()
     {
       return String.Format("[{0},{1}]", x, y);

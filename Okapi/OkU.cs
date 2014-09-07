@@ -49,6 +49,12 @@ namespace Okapi
       Any = Landscape | Portrait
     }
 
+    public enum DisplayForcedOrientation
+    {
+      SameAsDisplay,
+      Rotated
+    }
+
     public static int Abs(int value)
     {
       return value < 0 ? -value : value;
@@ -84,11 +90,24 @@ namespace Okapi
       return orientation == DisplayOrientation.Portrait ? DisplayOrientation.Landscape : DisplayOrientation.Portrait;
     }
 
-    public static bool ComputeScreenBoundary(OkPoint gameSize, float gameScale, GamePlacement gamePlacement, DisplayOrientation gameOrientation, OkPoint displaySize, DisplayOrientation displayOrientation, out OkRect computedGameRect, out DisplayOrientation computedGameOrientation, out float computedScale)
+    // gameSize is in pixels, it is scaled up or down by gamePlacement and/or gameScale.
+    // It has an orientation which is from gameOrientation, this is relative to the user's eye level and not the device.
+    // 
+    // displaySize should always be given in it's landscape orientation (i.e. the x is always the largest)
+    // displayOrientation can only be Portrait or Landscape
+    public static bool ComputeGamePlacementOnDisplay(OkPoint gameSize, float gameScale, GamePlacement gamePlacement, DisplayOrientation gameOrientation, OkPoint displaySize, DisplayOrientation displayOrientation, out OkRect computedGameRect, out DisplayForcedOrientation computedGameOrientation, out float computedScale)
     {
       computedGameRect = new OkRect(0, 0, (int)(gameSize.x * gameScale), (int)(gameSize.y * gameScale));
       computedScale = gameScale;
-      computedGameOrientation = displayOrientation;
+      computedGameOrientation = DisplayForcedOrientation.SameAsDisplay;
+
+      int gameWidth = 0;
+      int gameHeight = 0;
+      int displayWidth = 0;
+      int displayHeight = 0;
+
+      OkPoint landscapeGameSize = gameSize.SortElements();
+      OkPoint landscapeDisplaySize = displaySize.SortElements();
 
       switch (displayOrientation)
       {
@@ -97,9 +116,28 @@ namespace Okapi
           switch (gameOrientation)
           {
             case DisplayOrientation.Any:
+            case DisplayOrientation.Landscape:
+            {
+              // Display is Landscape
+              // Game wants to be in Landscape or anything
+              // Get's landscape
+              computedGameOrientation = DisplayForcedOrientation.SameAsDisplay;
+              gameWidth = landscapeGameSize.x;
+              gameHeight = landscapeGameSize.y;
+              displayWidth = landscapeDisplaySize.x;
+              displayHeight = landscapeDisplaySize.y;
+            }
+            break;
             case DisplayOrientation.Portrait:
             {
-              gameSize.SwapElements();
+              // Display is Portrait
+              // Game wants to be in Landscape or anything
+              // Get's portrait
+              computedGameOrientation = DisplayForcedOrientation.Rotated;
+              gameWidth = landscapeDisplaySize.y;
+              gameHeight = landscapeDisplaySize.x;
+              displayWidth = landscapeDisplaySize.y;
+              displayHeight = landscapeDisplaySize.x;
             }
             break;
           }
@@ -109,10 +147,29 @@ namespace Okapi
         {
           switch (gameOrientation)
           {
-            case DisplayOrientation.Any:
             case DisplayOrientation.Landscape:
             {
-              gameSize.SwapElements();
+              // Display is in Portrait
+              // Game wants to be in Landscape
+              // Get's landscape
+              computedGameOrientation = DisplayForcedOrientation.Rotated;
+              gameWidth = landscapeGameSize.x;
+              gameHeight = landscapeGameSize.y;
+              displayWidth = landscapeDisplaySize.y;
+              displayHeight = landscapeDisplaySize.x;
+            }
+            break;
+            case DisplayOrientation.Any:
+            case DisplayOrientation.Portrait:
+            {
+              // Display is in Portrait
+              // Game wants to be in Portrait
+              // Get's Portrait
+              computedGameOrientation = DisplayForcedOrientation.SameAsDisplay;
+              gameWidth = landscapeGameSize.y;
+              gameHeight = landscapeGameSize.x;
+              displayWidth = landscapeDisplaySize.y;
+              displayHeight = landscapeDisplaySize.x;
             }
             break;
           }
@@ -124,25 +181,23 @@ namespace Okapi
       {
         case GamePlacement.FixedScale:
         {
-          int width = (int)(gameSize.x * gameScale);
-          int height = (int)(gameSize.y * gameScale);
+          int width = (int)(gameWidth * gameScale);
+          int height = (int)(gameHeight * gameScale);
           int left = 0;
           int top = 0;
 
           computedGameRect = new OkRect(left, top, width, height);
-          computedGameOrientation = displayOrientation;
           computedScale = gameScale;
         }
         break;
         case GamePlacement.FixedScaleCentred:
         {
-          int width = (int)(gameSize.x * gameScale);
-          int height = (int)(gameSize.y * gameScale);
-          int left = displaySize.x / 2 - width / 2;
-          int top = displaySize.y / 2 - height / 2;
+          int width = (int)(gameWidth * gameScale);
+          int height = (int)(gameHeight * gameScale);
+          int left = displayWidth / 2 - width / 2;
+          int top = displayHeight / 2 - height / 2;
 
           computedGameRect = new OkRect(left, top, width, height);
-          computedGameOrientation = displayOrientation;
           computedScale = gameScale;
         }
         break;
@@ -150,21 +205,20 @@ namespace Okapi
         {
 
 
-          gameScale = 1.0f / Mathf.Max((float)gameSize.x / (float)displaySize.x, (float)gameSize.y / (float)displaySize.y);
+          gameScale = 1.0f / Mathf.Max((float)gameWidth / (float)displayWidth, (float)gameHeight / (float)displayHeight);
 
-          int width = (int)(gameSize.x * gameScale);
-          int height = (int)(gameSize.y * gameScale);
-          int left = displaySize.x / 2 - width / 2;
-          int top = displaySize.y / 2 - height / 2;
+          int width = (int)(gameWidth * gameScale);
+          int height = (int)(gameHeight * gameScale);
+          int left = displayWidth / 2 - width / 2;
+          int top = displayHeight / 2 - height / 2;
 
           computedGameRect = new OkRect(left, top, width, height);
-          computedGameOrientation = displayOrientation;
           computedScale = gameScale;
         }
         break;
       }
 
-      return (displaySize.x * displaySize.y - computedGameRect.Area() >= 0);
+      return (displayWidth * displayHeight - computedGameRect.Area() >= 0);
     }
 
   }

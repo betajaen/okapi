@@ -188,6 +188,37 @@ namespace OkapiEditor
 
         GUI.enabled = true;
 
+        // Resolution orientation
+        GUI.changed = false;
+        OkSetup.gameOrientation =
+          (OkU.DisplayOrientation)EditorGUILayout.EnumPopup("Orientation", OkSetup.gameOrientation);
+        if (GUI.changed)
+        {
+
+          OkPoint landscapedSize = new OkPoint(OkSetup.gameResolutionWidth, OkSetup.gameResolutionHeight).SortElements();
+
+          switch (OkSetup.gameOrientation)
+          {
+            case OkU.DisplayOrientation.Landscape:
+            {
+              OkSetup.gameResolutionWidth = landscapedSize.x;
+              OkSetup.gameResolutionHeight = landscapedSize.y;
+            }
+            break;
+            case OkU.DisplayOrientation.Portrait:
+            {
+              OkSetup.gameResolutionWidth = landscapedSize.y;
+              OkSetup.gameResolutionHeight = landscapedSize.x;
+            }
+            break;
+          }
+
+          if (resolutionPreview)
+          {
+            RefreshPreview();
+          }
+        }
+
         EditorGUI.indentLevel--;
       }
 
@@ -367,6 +398,7 @@ namespace OkapiEditor
           {
             mScreenPreview.mDisplayWidth = res.width;
             mScreenPreview.mDisplayHeight = res.height;
+            mScreenPreview.mDeviceType = res.type;
           }
           break;
         }
