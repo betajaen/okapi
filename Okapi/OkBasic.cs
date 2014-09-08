@@ -41,19 +41,19 @@ namespace Okapi
 
     protected virtual void Reset()
     {
-      if (Parent != null)
+      if (parent != null)
       {
-        Parent.Remove(this);
+        parent.Remove(this);
       }
 
-      Id = -1;
-      Exists = true;
-      Active = true;
-      Visible = true;
-      CameraMask = Int32.MaxValue;
-      NextSibling = null;
-      PreviousSibling = null;
-      Parent = null;
+      id = -1;
+      exists = true;
+      active = true;
+      visible = true;
+      cameraMask = Int32.MaxValue;
+      nextSibling = null;
+      previousSibling = null;
+      parent = null;
     }
 
     public virtual void Destroy()
@@ -82,28 +82,28 @@ namespace Okapi
 
     public virtual void Kill()
     {
-      Alive = false;
-      Exists = false;
+      alive = false;
+      exists = false;
     }
 
     public virtual void Revive()
     {
-      Alive = true;
-      Exists = true;
+      alive = true;
+      exists = true;
     }
 
 
-    public int Id { get; private set; }
-    public bool Exists { get; private set; }
-    public bool Active { get; private set; }
-    public bool Alive { get; private set; }
-    public bool Visible { get; private set; }
+    public int id { get; private set; }
+    public bool exists { get; private set; }
+    public bool active { get; private set; }
+    public bool alive { get; private set; }
+    public bool visible { get; private set; }
 
-    public OkBasic NextSibling { get; internal set; }
-    public OkBasic PreviousSibling { get; internal set; }
-    public OkGroup Parent { get; internal set; }
+    public OkBasic nextSibling { get; internal set; }
+    public OkBasic previousSibling { get; internal set; }
+    public OkGroup parent { get; internal set; }
 
-    public int CameraMask { get; set; }
+    public int cameraMask { get; set; }
 
   }
 

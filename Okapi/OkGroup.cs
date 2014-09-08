@@ -63,11 +63,11 @@ namespace Okapi
 
       while (basic != null)
       {
-        OkBasic next = basic.NextSibling;
+        OkBasic next = basic.nextSibling;
         basic.Destroy();
-        basic.NextSibling = null;
-        basic.PreviousSibling = null;
-        basic.Parent = null;
+        basic.nextSibling = null;
+        basic.previousSibling = null;
+        basic.parent = null;
         basic = next;
       }
 
@@ -80,15 +80,15 @@ namespace Okapi
     public virtual void Add(T value)
     {
 
-      if (value.Parent != null)
+      if (value.parent != null)
       {
-        value.Parent.Remove(value);
+        value.parent.Remove(value);
       }
 
       if (mLastChild != null)
       {
-        mLastChild.NextSibling = value;
-        value.PreviousSibling = mLastChild;
+        mLastChild.nextSibling = value;
+        value.previousSibling = mLastChild;
         mLastChild = value;
       }
       else
@@ -96,27 +96,27 @@ namespace Okapi
         mFirstChild = mLastChild = value;
       }
 
-      value.Parent = this;
+      value.parent = this;
     }
 
     public virtual void Remove(T value)
     {
-      if (value.Parent == null || value.Parent != this)
+      if (value.parent == null || value.parent != this)
       {
         throw new InvalidOperationException(String.Format("Object {0} does not belong to this Group {1} or any Group", value, this));
       }
 
-      OkBasic next = value.NextSibling;
-      OkBasic previous = value.PreviousSibling;
+      OkBasic next = value.nextSibling;
+      OkBasic previous = value.previousSibling;
 
       if (previous != null)
       {
-        previous.NextSibling = next;
+        previous.nextSibling = next;
       }
 
       if (next != null)
       {
-        next.PreviousSibling = previous;
+        next.previousSibling = previous;
       }
 
       if (mFirstChild == value)
@@ -129,9 +129,9 @@ namespace Okapi
         mLastChild = previous as T;
       }
 
-      value.NextSibling = null;
-      value.PreviousSibling = null;
-      value.Parent = null;
+      value.nextSibling = null;
+      value.previousSibling = null;
+      value.parent = null;
 
     }
 
@@ -141,8 +141,8 @@ namespace Okapi
 
       while (basic != null)
       {
-        OkBasic next = basic.NextSibling;
-        if (basic.Exists && basic.Active)
+        OkBasic next = basic.nextSibling;
+        if (basic.exists && basic.active)
         {
           basic.PreUpdate();
           basic.Update();
@@ -158,8 +158,8 @@ namespace Okapi
 
       while (basic != null)
       {
-        OkBasic next = basic.NextSibling;
-        if (basic.Exists && basic.Visible)
+        OkBasic next = basic.nextSibling;
+        if (basic.exists && basic.visible)
         {
           basic.PreDraw();
         }
@@ -173,8 +173,8 @@ namespace Okapi
 
       while (basic != null)
       {
-        OkBasic next = basic.NextSibling;
-        if (basic.Exists && basic.Visible)
+        OkBasic next = basic.nextSibling;
+        if (basic.exists && basic.visible)
         {
           basic.Draw();
         }
@@ -214,7 +214,6 @@ namespace Okapi
     public override OkBasic lastChild
     {
       get { return mLastChild; }
-
     }
 
     public override int childCount

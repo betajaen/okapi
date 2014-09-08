@@ -204,7 +204,6 @@ namespace Okapi
         case GamePlacement.FitToScreenCentred:
         {
 
-
           gameScale = 1.0f / Mathf.Max((float)gameWidth / (float)displayWidth, (float)gameHeight / (float)displayHeight);
 
           int width = (int)(gameWidth * gameScale);

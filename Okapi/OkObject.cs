@@ -574,7 +574,7 @@ namespace Okapi
         OkBasic child = group.firstChild;
         while (child != null)
         {
-          OkBasic next = child.NextSibling;
+          OkBasic next = child.nextSibling;
           if (Overlaps(child, inScreenSpace, camera))
           {
             results = true;
@@ -626,7 +626,7 @@ namespace Okapi
         OkBasic child = group.firstChild;
         while (child != null)
         {
-          OkBasic next = child.NextSibling;
+          OkBasic next = child.nextSibling;
           if (OverlapsAt(atX, atY, child, inScreenSpace, camera))
           {
             results = true;

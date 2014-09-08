@@ -31,63 +31,94 @@ using UnityEngine;
 namespace Okapi
 {
 
-  [RequireComponent(typeof(Giraffe))]
   [RequireComponent(typeof(Camera))]
   public sealed class OkOkapi : MonoBehaviour
   {
 
     [SerializeField]
-    public GiraffeAtlas[] atlases;
+    private GiraffeAtlas[] mAtlases;
 
     [SerializeField]
-    public String gameName;
+    private String mGameName;
 
     [NonSerialized]
     private OkGame mGame;
 
-    [HideInInspector]
     [SerializeField]
-    private OkU.GamePlacement mPlacement;
+    private int mGameWidth;
 
-    [HideInInspector]
     [SerializeField]
-    private OkU.DisplayOrientation mPreferredOrientation;
+    private int mGameHeight;
 
-    [HideInInspector]
+    [SerializeField]
+    private OkU.GamePlacement mGamePlacement;
+
+    [SerializeField]
+    private OkU.DisplayOrientation mGameOrientation;
+
     [SerializeField]
     private float mCustomScale;
 
     [NonSerialized]
     private bool mStarted;
 
-    public OkU.GamePlacement placement
+    public void AddAtlas(GiraffeAtlas atlas)
+    {
+      Array.Resize(ref mAtlases, mAtlases == null ? 1 : mAtlases.Length + 1);
+      mAtlases[mAtlases.Length - 1] = atlas;
+    }
+
+    public String gameName
+    {
+      get { return mGameName; }
+      set { mGameName = value; }
+    }
+
+    public OkPoint resolution
     {
       get
       {
-        return mPlacement;
+        return new OkPoint(mGameWidth, mGameHeight);
       }
       set
       {
-        mPlacement = value;
+        mGameWidth = value.x;
+        mGameHeight = value.y;
         if (Application.isPlaying && mStarted)
         {
-          ApplyPresentation();
+          OnResolutionChange();
         }
       }
     }
 
-    public OkU.DisplayOrientation preferredOrientation
+    public OkU.GamePlacement placement
     {
       get
       {
-        return mPreferredOrientation;
+        return mGamePlacement;
       }
       set
       {
-        mPreferredOrientation = value;
+        mGamePlacement = value;
         if (Application.isPlaying && mStarted)
         {
-          ApplyPresentation();
+          OnResolutionChange();
+        }
+      }
+    }
+
+    public OkU.DisplayOrientation orientation
+    {
+      get
+      {
+        return mGameOrientation;
+      }
+      set
+      {
+        mGameOrientation = value;
+        if (Application.isPlaying && mStarted)
+        {
+          OnResolutionChange();
         }
       }
     }
@@ -103,7 +134,7 @@ namespace Okapi
         mCustomScale = value;
         if (Application.isPlaying && mStarted)
         {
-          ApplyPresentation();
+          OnResolutionChange();
         }
       }
     }
@@ -122,10 +153,17 @@ namespace Okapi
 
     private static OkOkapi msInstance;
 
-
-    void ApplyPresentation()
+    void FixedUpdate()
     {
+      mGame.ProcessUpdate();
+    }
 
+    void OnDisplayChange()
+    {
+    }
+
+    void OnResolutionChange()
+    {
     }
 
   }

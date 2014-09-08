@@ -275,8 +275,30 @@ namespace OkapiEditor
           SendUpdate("Setting up the Scene", 50);
 
           tGameObject = new GameObject("Okapi Game");
+
+          Camera cam = tGameObject.AddComponent<Camera>();
+          cam.clearFlags = CameraClearFlags.Nothing;
+          cam.depth = 100;
+          cam.orthographic = true;
+
+          Giraffe giraffe = tGameObject.AddComponent<Giraffe>();
+
           tGame = tGameObject.AddComponent<Okapi.OkOkapi>();
           tGame.gameName = name;
+
+          if (atlasReference != null)
+          {
+            tGame.AddAtlas(atlasReference);
+          }
+
+          tGame.customScale = gameCustomScale;
+          tGame.resolution = new OkPoint(gameResolutionWidth, gameResolutionHeight);
+          tGame.placement = gamePlacement;
+          tGame.orientation = gameOrientation;
+
+          EditorUtility.SetDirty(tGameObject);
+          EditorUtility.SetDirty(tGame);
+
 
           WaitThen(10, kState_Finished);
         }
@@ -308,13 +330,22 @@ namespace OkapiEditor
       @"using Okapi;
 
 $NSB
-public class $CLA : OkGame
+public sealed class $CLA : OkGame
 {
+
+  public static $CLA Instance
+  {
+    get;
+    private set;
+  }
+
   public $CLA()
   {
-    Run<$STA>();
+    Instance = this;
+    Add<$STA>();
     // Any extra game related code you want can go here.
   }
+
 }
 $NSE
 ";
@@ -324,7 +355,7 @@ $NSE
 using UnityEngine;
 
 $NSB
-public class $CLA : OkState
+public sealed class $CLA : OkState
 {
   public $CLA()
   {

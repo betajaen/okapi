@@ -23,10 +23,23 @@ namespace OkapiEditor
       {
         if (msNames == null)
         {
-          msNames = new GUIContent[msResolutions.Length];
-          for (int i = 0; i < msResolutions.Length; i++)
+          UnityEngine.Resolution[] resolutions = Screen.resolutions;
+
+          int totalCount = msStockResolutions.Length + resolutions.Length;
+          msNames = new GUIContent[totalCount];
+          msResolutions = new OkResolution[totalCount];
+
+          for (int i = 0; i < msStockResolutions.Length; i++)
           {
-            msNames[i] = new GUIContent(msResolutions[i].displayName);
+            msNames[i] = new GUIContent(msStockResolutions[i].displayName);
+            msResolutions[i] = msStockResolutions[i];
+          }
+          for (int i = 0; i < resolutions.Length; i++)
+          {
+            Resolution r = resolutions[i];
+            OkResolution res = new OkResolution("This Computer", String.Empty, OkDeviceType.Screen, r.width, r.height);
+            msNames[i + msStockResolutions.Length] = new GUIContent(res.displayName);
+            msResolutions[i + msStockResolutions.Length] = res;
           }
         }
         return msNames;
@@ -38,7 +51,7 @@ namespace OkapiEditor
       get { return msResolutions; }
     }
 
-    private static readonly OkResolution[] msResolutions =
+    private readonly static OkResolution[] msStockResolutions =
     {
       new OkResolution(String.Empty, "480p", OkDeviceType.Screen, 640,480),
       new OkResolution(String.Empty, "720p", OkDeviceType.Screen, 1280,720),
@@ -65,6 +78,8 @@ namespace OkapiEditor
       new OkResolution("Android", "16:9", OkDeviceType.Mobile, 1280, 720),
       new OkResolution("Android", "16:10", OkDeviceType.Mobile, 1650, 1050),
     };
+
+    private static OkResolution[] msResolutions;
     private static GUIContent[] msNames;
 
     protected OkResolution(String group_, String name_, OkDeviceType type_, int width_, int height_)

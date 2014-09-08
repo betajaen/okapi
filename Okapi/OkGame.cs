@@ -25,7 +25,6 @@
     
 */
 
-using System;
 using UnityEngine;
 
 namespace Okapi
@@ -34,22 +33,35 @@ namespace Okapi
   public abstract class OkGame : ScriptableObject
   {
 
+    protected OkGroupOf<OkState> mStates;
+    protected OkGroupOf<OkCamera> mCameras;
+
     protected OkGame()
     {
+      mStates = new OkGroupOf<OkState>();
+      mCameras = new OkGroupOf<OkCamera>();
     }
 
-    protected void Run<T>(int scale) where T : OkState, new()
+    protected void Add<T>() where T : OkState, new()
     {
-      Debug.Log("Hello");
+      var state = new T();
+      mStates.Add(state);
     }
 
-    protected void Stop()
+    public void ProcessUpdate()
     {
-    }
-
-    public void ProcessFrame()
-    {
-
+      OkState state = mStates.firstChild as OkState;
+      while (state != null)
+      {
+        OkState next = state.nextSibling as OkState;
+        if (state.doesUpdate)
+        {
+          state.PreUpdate();
+          state.Update();
+          state.PostUpdate();
+        }
+        state = next;
+      }
     }
 
   }
