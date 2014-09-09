@@ -16,6 +16,23 @@ namespace Okapi
     private Quaternion mRotation;
     private Matrix4x4 mTransform;
 
+    private Vector3[] mDataPositions;
+    private Color32[] mDataColours;
+    private Vector2[] mDataTextureCoords;
+    private int[] mIndexes;
+
+    private int mVertexCount;
+    private int mIndexCount;
+
+    private int mIteratorVertices;
+    private int mIteratorIndexes;
+    private int mVertexIndex;
+    private Color32 mColour;
+    private bool mClearMesh;
+
+    private readonly Vector3[] mQuadPosition = new Vector3[4];
+    private readonly Vector3[] mQuadTextureCoord = new Vector3[4];
+
     public OkSurface()
     {
       mMesh = new Mesh();
@@ -24,6 +41,10 @@ namespace Okapi
 
     public void Destroy()
     {
+      mDataPositions = null;
+      mDataTextureCoords = null;
+      mIndexes = null;
+      Object.Destroy(mMesh);
     }
 
     public Vector2 position
@@ -74,6 +95,114 @@ namespace Okapi
     {
       mMaterial.SetPass(0);
       Graphics.DrawMeshNow(mMesh, mTransform);
+    }
+
+    public void Begin(int nbQuads)
+    {
+      int nbVertices = nbQuads * 4;
+      int nbIndexes = nbQuads * 6;
+
+      Reserve(nbVertices, nbIndexes);
+
+      mIteratorVertices = 0;
+      mIteratorIndexes = 0;
+      mVertexIndex = 0;
+      mColour = new Color32(255, 255, 255, 255);
+
+    }
+
+    void Reserve(int nbVertices, int nbIndexes)
+    {
+      mClearMesh = nbVertices != mVertexCount;
+
+      if (nbVertices > mVertexCount || nbIndexes > mIndexCount)
+      {
+
+        mVertexCount = nbVertices;
+        mDataPositions = new Vector3[mVertexCount];
+        mDataTextureCoords = new Vector2[mVertexCount];
+        mDataColours = new Color32[mVertexCount];
+
+        mIndexCount = nbIndexes;
+        mIndexes = new int[mIndexCount];
+      }
+      else
+      {
+        for (int i = nbIndexes; i < mIndexCount; i++)
+          mIndexes[i] = 0;
+      }
+    }
+
+    void End()
+    {
+
+      mMesh.MarkDynamic();
+
+      if (mClearMesh)
+      {
+        mMesh.Clear();
+      }
+
+      mMesh.vertices = mDataPositions;
+      mMesh.uv = mDataTextureCoords;
+      mMesh.colors32 = mDataColours;
+
+      mMesh.SetIndices(mIndexes, MeshTopology.Triangles, 0);
+    }
+
+    void Add(float r0, float s0, float r1, float s1, float u0, float v0, float u1, float v1)
+    {
+
+      // 0---1
+      // |\  |
+      // | \ |
+      // 3--\2
+
+      mQuadPosition[0].x = r0;
+      mQuadPosition[0].y = s0;
+      mQuadTextureCoord[0].x = u0;
+      mQuadTextureCoord[0].y = v0;
+
+      mQuadPosition[1].x = r1;
+      mQuadPosition[1].y = s0;
+      mQuadTextureCoord[1].x = u1;
+      mQuadTextureCoord[1].y = u0;
+
+      mQuadPosition[2].x = r1;
+      mQuadPosition[2].y = s1;
+      mQuadTextureCoord[2].x = u1;
+      mQuadTextureCoord[2].y = v1;
+
+      mQuadPosition[3].x = r0;
+      mQuadPosition[3].y = s1;
+      mQuadTextureCoord[3].x = u0;
+      mQuadTextureCoord[3].y = v1;
+
+      mDataPositions[mIteratorVertices] = mQuadPosition[0];
+      mDataTextureCoords[mIteratorVertices] = mQuadTextureCoord[0];
+      mDataColours[mIteratorVertices++] = mColour;
+
+      mDataPositions[mIteratorVertices] = mQuadPosition[1];
+      mDataTextureCoords[mIteratorVertices] = mQuadTextureCoord[1];
+      mDataColours[mIteratorVertices++] = mColour;
+
+      mDataPositions[mIteratorVertices] = mQuadPosition[2];
+      mDataTextureCoords[mIteratorVertices] = mQuadTextureCoord[2];
+      mDataColours[mIteratorVertices++] = mColour;
+
+      mDataPositions[mIteratorVertices] = mQuadPosition[3];
+      mDataTextureCoords[mIteratorVertices] = mQuadTextureCoord[3];
+      mDataColours[mIteratorVertices++] = mColour;
+
+      mIndexes[mIteratorIndexes++] = mVertexIndex;
+      mIndexes[mIteratorIndexes++] = mVertexIndex + 1;
+      mIndexes[mIteratorIndexes++] = mVertexIndex + 2;
+
+      mIndexes[mIteratorIndexes++] = mVertexIndex;
+      mIndexes[mIteratorIndexes++] = mVertexIndex + 2;
+      mIndexes[mIteratorIndexes++] = mVertexIndex + 3;
+      mVertexIndex += 4;
+
     }
 
   }
