@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Runtime.Remoting.Messaging;
+using UnityEngine;
 
 namespace Okapi
 {
@@ -150,7 +151,12 @@ namespace Okapi
       mMesh.SetIndices(mIndexes, MeshTopology.Triangles, 0);
     }
 
-    void Add(float r0, float s0, float r1, float s1, float u0, float v0, float u1, float v1)
+    public void SetColour(Color32 colour)
+    {
+      mColour = colour;
+    }
+
+    public void Add(float r0, float s0, float r1, float s1, float u0, float v0, float u1, float v1)
     {
 
       // 0---1
@@ -207,8 +213,42 @@ namespace Okapi
 
   }
 
-  public class OkDrawing
+  public static class OkDrawing
   {
+
+    private static OkSurface msSurface;
+
+    internal static void __SetSurface(OkSurface surface)
+    {
+      msSurface = surface;
+      msSurface.SetColour(msColour);
+    }
+
+    private static Color32 msColour = new Color32(255, 255, 255, 255);
+
+    public static Color32 colour
+    {
+      get { return msColour; }
+      set
+      {
+        msColour = colour;
+        if (msSurface != null)
+        {
+          msSurface.SetColour(msColour);
+        }
+      }
+    }
+
+    public static void Draw(int x, int y, OkTexture texture)
+    {
+      msSurface.Add(x, y, x + texture.w, y + texture.h, texture.u0, texture.v0, texture.u1, texture.v1);
+    }
+
+    public static void Draw(int x, int y, int w, int h, OkTexture texture)
+    {
+      msSurface.Add(x, y, x + w, y + h, texture.u0, texture.v0, texture.u1, texture.v1);
+    }
+
   }
 
 }
